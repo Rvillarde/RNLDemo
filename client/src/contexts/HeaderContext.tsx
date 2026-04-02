@@ -3,6 +3,7 @@ import { createContext, useContext, useState, type FC, type ReactNode } from "re
 type HeaderContextType = {
     isOpen: boolean;
     toggleUserMenu: () => void;
+    closeUserMenu: () => void;
 };
 
 const HeaderContext = createContext<HeaderContextType | undefined>(undefined);
@@ -24,8 +25,12 @@ export const HeaderProvider: FC<{ children: ReactNode }> = ({ children }) => {
         setIsOpen((prev) => !prev);
     };
 
+    const closeUserMenu = () => {
+        setIsOpen(false);
+    };
+
     return (
-        <HeaderContext.Provider value={{ isOpen, toggleUserMenu }}>
+        <HeaderContext.Provider value={{ isOpen, toggleUserMenu, closeUserMenu }}>
             {children}
         </HeaderContext.Provider>
     );
