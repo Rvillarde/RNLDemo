@@ -1,95 +1,97 @@
-import type { ChangeEvent, FC } from "react";
-import { useState } from "react";
-import { Eye, EyeOff, CalendarDays } from "lucide-react";
+import { useRef, useState } from "react";
+import { CalendarDays, Eye, EyeOff } from "lucide-react";
 
-interface FloatingLabelInputProps {
+type FloatingLabelInputProps = {
     label: string;
-    type: "text" | "date" | "password";
+    type?: string;
     name: string;
-    value?: string;
-    onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
+    value: string;
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     required?: boolean;
     autoFocus?: boolean;
-    disabled?: boolean;
-    readonly?: boolean
-    errors?: string[];
-}
+};
 
-const FloatingLabelInput: FC<FloatingLabelInputProps> = ({
+const FloatingLabelInput = ({
     label,
-    type,
+    type = "text",
     name,
     value,
     onChange,
-    required,
-    autoFocus,
-    disabled,
-    readonly,
-    errors,
-}) => {
+    required = false,
+    autoFocus = false,
+}: FloatingLabelInputProps) => {
+    const inputRef = useRef<HTMLInputElement | null>(null);
     const [showPassword, setShowPassword] = useState(false);
 
-    const inputType =
-        type === "password" ? (showPassword ? "text" : "password") : type;
+    const isDate = type === "date";
+    const isPassword = type === "password";
 
-    const hasRightIcon = type === "date" || type === "password";
+    const inputType = isPassword
+        ? showPassword
+            ? "text"
+            : "password"
+        : type;
+
+    const openDatePicker = () => {
+        if (inputRef.current) {
+            inputRef.current.focus();
+
+            if (typeof inputRef.current.showPicker === "function") {
+                inputRef.current.showPicker();
+            }
+        }
+    };
 
     return (
         <div className="relative w-full">
             <input
+                ref={inputRef}
                 type={inputType}
-                id={name}
                 name={name}
                 value={value}
                 onChange={onChange}
-                placeholder=" "
                 required={required}
                 autoFocus={autoFocus}
-                disabled={disabled}
-                readOnly={readonly}
+                placeholder=" "
                 className={`
-          peer block w-full appearance-none border-0 border-b-2 border-gray-800
-          bg-transparent px-0 pt-6 pb-2.5 text-sm text-gray-900
-          focus:border-blue-600 focus:outline-none focus:ring-0
-          ${hasRightIcon ? "pr-10" : ""}
-          ${disabled ? "cursor-not-allowed opacity-60" : ""}
-        `}
+                    peer w-full border-0 border-b border-slate-700 bg-transparent
+                    px-0 pt-6 pb-2 text-[16px] text-slate-900
+                    focus:border-slate-900 focus:outline-none focus:ring-0
+                    ${isDate ? "[&::-webkit-calendar-picker-indicator]:hidden" : ""}
+                `}
             />
 
             <label
                 htmlFor={name}
                 className="
-          absolute top-4 left-0 z-10 origin-[0] -translate-y-4 scale-75
-          transform text-sm text-gray-700 duration-300
-          peer-placeholder-shown:translate-y-0
-          peer-placeholder-shown:scale-100
-          peer-focus:-translate-y-4
-          peer-focus:scale-75
-          peer-focus:text-blue-600
-        "
+                    absolute left-0 top-2 text-sm text-slate-600 transition-all
+                    peer-placeholder-shown:top-5 peer-placeholder-shown:text-base
+                    peer-placeholder-shown:text-slate-500
+                    peer-focus:top-2 peer-focus:text-sm peer-focus:text-slate-600
+                "
             >
                 {label}
-                {required && <span className="ml-1 text-red-600">*</span>}
+                {required && <span className="ml-1 text-red-500">*</span>}
             </label>
 
-            {type === "date" && (
-                <span className="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 text-gray-700">
-                    <CalendarDays size={18} />
-                </span>
-            )}
-
-            {type === "password" && (
+            {isDate && (
                 <button
                     type="button"
-                    onClick={() => setShowPassword((prev) => !prev)}
-                    className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-700 hover:text-blue-600"
+                    onClick={openDatePicker}
+                    className="absolute right-0 top-1/2 -translate-y-1/2 text-slate-700"
                 >
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    <CalendarDays size={22} />
                 </button>
             )}
 
-            {errors && errors.length > 0 && (
-                <p className="mt-1 text-sm text-red-600">{errors[0]}</p>
+            {isPassword && (
+                <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-0 top-1/2 -translate-y-1/2 text-slate-700"
+                >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
             )}
         </div>
     );
