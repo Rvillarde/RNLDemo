@@ -1,13 +1,29 @@
 import { Routes, Route } from "react-router-dom";
+import { useState } from "react";
 import AppLayout from "../layout/AppLayout";
 import FloatingLabelInput from "../components/Input/FloatingLabelInput";
-import { useState } from "react";
+import FloatingLabelSelect from "../components/Input/Select/FloatingLabelSelect";
+import {
+    Table,
+    TableHeader,
+    TableBody,
+    TableRow,
+    TableCell,
+} from "../components/Table";
 
 const SampleComponent = () => {
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [birthDate, setBirthDate] = useState("");
     const [password, setPassword] = useState("");
+    const [gender, setGender] = useState("");
+
+    const genders = [
+        { value: "", text: "Select Gender" },
+        { value: "1", text: "Male" },
+        { value: "2", text: "Female" },
+        { value: "3", text: "Preferred Not to Say" },
+    ];
 
     return (
         <div className="px-10 py-8">
@@ -58,6 +74,59 @@ const SampleComponent = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                 />
+
+                <p className="font-medium">Gender: {gender}</p>
+
+                <div className="mb-4">
+                    <FloatingLabelSelect
+                        label="Gender"
+                        name="gender"
+                        value={gender}
+                        onChange={(e) => setGender(e.target.value)}
+                    >
+                        {genders.map((item, index) => (
+                            <option value={item.value} key={index}>
+                                {item.text}
+                            </option>
+                        ))}
+                    </FloatingLabelSelect>
+                </div>
+            </div>
+
+            <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
+                <div className="max-w-full max-h-[calc(100vh)] overflow-x-auto">
+                    <Table>
+                        <TableHeader className="sticky top-0 z-30 border-b border-gray-100 bg-blue-600 text-xs text-white">
+                            <TableRow>
+                                <TableCell
+                                    isHeader
+                                    className="px-5 py-3 font-medium text-center"
+                                >
+                                    No.
+                                </TableCell>
+                                <TableCell
+                                    isHeader
+                                    className="px-5 py-3 font-medium text-start"
+                                >
+                                    Gender
+                                </TableCell>
+                            </TableRow>
+                        </TableHeader>
+
+                        <TableBody>
+                            {genders.map((item, index) => (
+                                <TableRow key={index}>
+                                    <TableCell className="px-4 py-4 text-center">
+                                        {item.value || "-"}
+                                    </TableCell>
+                                    <TableCell className="px-4 py-4 text-start">
+                                        {item.text}
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </div>
             </div>
         </div>
     );
